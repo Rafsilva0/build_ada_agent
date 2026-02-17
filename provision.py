@@ -441,7 +441,7 @@ CRITICAL: Respond with **one single JSON array only**. No markdown. No text outs
   ...{num_articles} objects total...
 ]"""
 
-    articles_response = await generate_claude_completion(articles_prompt, temperature=0.5, max_tokens=6000)
+    articles_response = await generate_claude_completion(articles_prompt, temperature=0.5, max_tokens=8000)
 
     # Clean Claude markdown
     cleaned = articles_response.strip()
@@ -467,14 +467,7 @@ CRITICAL: Respond with **one single JSON array only**. No markdown. No text outs
     try:
         articles = json.loads(cleaned)
     except json.JSONDecodeError as e:
-        print_status("❌", f"JSON parse failed at position {e.pos}: {str(e)}", Colors.FAIL)
-        # Show context around the error
-        start_ctx = max(0, e.pos - 150)
-        end_ctx = min(len(cleaned), e.pos + 150)
-        error_context = cleaned[start_ctx:end_ctx]
-        print_status("DEBUG", f"Context around error (pos {e.pos}):", Colors.WARNING)
-        print_status("DEBUG", f"{error_context}", Colors.WARNING)
-        print_status("DEBUG", f"Full cleaned response saved to /tmp/claude_response_error.txt", Colors.WARNING)
+        print_status("⚠️", f"JSON parse failed at position {e.pos} - retrying with shorter content...", Colors.WARNING)
 
         # Save full response to file for inspection
         try:
@@ -483,7 +476,44 @@ CRITICAL: Respond with **one single JSON array only**. No markdown. No text outs
         except:
             pass
 
-        raise ValueError(f"Failed to parse knowledge articles JSON at position {e.pos}. Check logs for details.")
+        # Retry with shorter article content to avoid token limit truncation
+        retry_prompt = f"""You are an expert content writer for a company knowledge base.
+
+Return a single valid JSON array of {num_articles} FAQ articles for: {company_name}
+
+Each article must have:
+- A clear, question-style title in the "name" field
+- A concise body (60-80 words MAX) in the "content" field
+- The same "knowledge_source_id": "demosource"
+- A string "id" from "1" to "{num_articles}"
+
+Company description: {company_desc}
+
+CRITICAL: Respond with **one single JSON array only**. No markdown. No text outside JSON. Keep content SHORT.
+
+[
+  {{"id": "1", "name": "Question 1?", "content": "60-80 word answer.", "knowledge_source_id": "demosource"}},
+  ...{num_articles} objects total...
+]"""
+
+        print_status("DEBUG", f"Retrying with shorter content prompt...", Colors.WARNING)
+        retry_response = await generate_claude_completion(retry_prompt, temperature=0.5, max_tokens=8000)
+
+        retry_cleaned = retry_response.strip()
+        if retry_cleaned.startswith("```json"):
+            retry_cleaned = retry_cleaned[7:]
+        if retry_cleaned.startswith("```"):
+            retry_cleaned = retry_cleaned[3:]
+        if retry_cleaned.endswith("```"):
+            retry_cleaned = retry_cleaned[:-3]
+        retry_cleaned = retry_cleaned.strip()
+
+        try:
+            articles = json.loads(retry_cleaned)
+            print_status("✅", f"Retry succeeded - parsed {len(articles)} articles", Colors.OKGREEN)
+        except json.JSONDecodeError as e2:
+            print_status("❌", f"Retry also failed at position {e2.pos}", Colors.FAIL)
+            raise ValueError(f"Failed to parse knowledge articles JSON after retry. Check logs for details.")
 
     print_status("✅", f"Generated {len(articles)} articles", Colors.OKGREEN)
 
