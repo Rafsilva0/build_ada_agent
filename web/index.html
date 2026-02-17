@@ -444,11 +444,11 @@
                             type="number"
                             id="numArticles"
                             name="numArticles"
-                            value="50"
+                            value="10"
                             min="1"
-                            max="100"
+                            max="10"
                         >
-                        <div class="help-text">Default: 50 articles</div>
+                        <div class="help-text">Max: 10 articles</div>
                     </div>
 
                     <div class="form-group">
@@ -457,11 +457,11 @@
                             type="number"
                             id="numConversations"
                             name="numConversations"
-                            value="100"
+                            value="50"
                             min="1"
                             max="200"
                         >
-                        <div class="help-text">Default: 100 (1-turn conversations)</div>
+                        <div class="help-text">Default: 50 (1-turn conversations)</div>
                     </div>
                 </div>
 
@@ -621,42 +621,7 @@
                                 <div><strong>Beeceptor:</strong> <a href="https://app.beeceptor.com/console/ada-demo" target="_blank">View Endpoints ↗</a></div>
                             </div>
 
-                            <div style="margin-top: 24px; padding: 20px; background: #F7FAFC; border-radius: 8px;">
-                                <h4 style="margin: 0 0 16px 0; color: var(--ada-gray-dark); font-size: 16px; font-weight: 700;">🎯 Demo Use Cases</h4>
-
-                                <div style="margin-bottom: 16px;">
-                                    <div style="font-weight: 600; color: var(--ada-purple); margin-bottom: 8px;">1. 📍 Product Availability & Store Locator</div>
-                                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
-                                        Customers can check if products are in stock at nearby stores and get directions.
-                                    </div>
-                                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
-                                        <strong>Action:</strong> Check Product Availability<br>
-                                        <strong>Endpoint:</strong> /product_availability
-                                    </div>
-                                </div>
-
-                                <div style="margin-bottom: 16px;">
-                                    <div style="font-weight: 600; color: var(--ada-purple); margin-bottom: 8px;">2. 📦 Order Status & Tracking</div>
-                                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
-                                        Real-time order tracking with delivery updates and estimated arrival times.
-                                    </div>
-                                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
-                                        <strong>Action:</strong> Get Order Status<br>
-                                        <strong>Endpoint:</strong> /order_status
-                                    </div>
-                                </div>
-
-                                <div style="margin-bottom: 16px;">
-                                    <div style="font-weight: 600; color: var(--ada-purple); margin-bottom: 8px;">3. 💰 Price Match & Promotions</div>
-                                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
-                                        Check current prices, active promotions, and apply price matching with competitors.
-                                    </div>
-                                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
-                                        <strong>Action:</strong> Check Price & Promotions<br>
-                                        <strong>Endpoint:</strong> /price_promotions
-                                    </div>
-                                </div>
-                            </div>
+                            ${buildDemoUseCases(result)}
 
                             <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                                 <button onclick="window.open('${result.bot_url}/chat', '_blank')"
@@ -705,6 +670,65 @@
                     submitBtn.innerHTML = '<span>🚀</span><span>Create My Agent</span>';
                 }
             }, 2000);  // Poll every 2 seconds
+        }
+
+        function buildDemoUseCases(result) {
+            // Pick a KB article title for the knowledge base use case
+            const titles = result.article_titles || [];
+            const kbTitle = titles.length > 0 ? titles[0] : 'Common Questions';
+            // Strip question mark if present to use as a topic label
+            const kbTopic = kbTitle.replace(/\?$/, '').trim();
+
+            return `<div style="margin-top: 24px; padding: 20px; background: #F7FAFC; border-radius: 8px;">
+                <h4 style="margin: 0 0 16px 0; color: var(--ada-gray-dark); font-size: 16px; font-weight: 700;">🎯 Demo Use Cases</h4>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-weight: 600; color: var(--ada-primary); margin-bottom: 8px;">1. 📚 Knowledge Base Q&amp;A</div>
+                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
+                        Ask the agent about <em>${escapeHtml(kbTopic)}</em> — answered directly from the knowledge base.
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
+                        <strong>Try asking:</strong> "${escapeHtml(kbTitle)}"<br>
+                        <strong>Source:</strong> Knowledge Base (demosource)
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-weight: 600; color: var(--ada-primary); margin-bottom: 8px;">2. 📦 Order Status &amp; Tracking</div>
+                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
+                        Real-time order tracking with delivery updates and estimated arrival times.
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
+                        <strong>Action:</strong> Get Order Status<br>
+                        <strong>Endpoint:</strong> /order_status
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-weight: 600; color: var(--ada-primary); margin-bottom: 8px;">3. 💰 Price Match &amp; Promotions</div>
+                    <div style="font-size: 13px; color: var(--ada-gray-medium); margin-bottom: 8px;">
+                        Check current prices, active promotions, and apply price matching with competitors.
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; font-family: monospace;">
+                        <strong>Action:</strong> Check Price &amp; Promotions<br>
+                        <strong>Endpoint:</strong> /price_promotions
+                    </div>
+                </div>
+
+                ${titles.length > 1 ? `<div style="margin-top: 12px; padding: 12px; background: white; border-radius: 6px; font-size: 12px; color: var(--ada-gray-medium);">
+                    <strong style="color: var(--ada-gray-dark);">📋 All KB Articles:</strong><br>
+                    ${titles.map((t, i) => `${i + 1}. ${escapeHtml(t)}`).join('<br>')}
+                </div>` : ''}
+            </div>`;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function copyToClipboard(text) {

@@ -1213,6 +1213,7 @@ async def provision_demo(
         "bot_url": f"https://{bot_handle}.ada.support",
         "api_key": api_key,
         "articles_count": len(articles),
+        "article_titles": [a.get("name", "") for a in articles],
         "questions_count": len(questions),
         "conversations_created": conversations_created,
         "channel_id": channel_id,
