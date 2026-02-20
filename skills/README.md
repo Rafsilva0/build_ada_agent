@@ -12,46 +12,15 @@ These skills let the SC team run the Ada demo provisioning directly from Claude 
 
 ## Installation
 
-### 1. Clone the repo (if you haven't already)
+Copy and paste the following prompt into Claude Code:
 
-```bash
-git clone https://github.com/Rafsilva0/demo_automation.git ~/Documents/GitHub/demo_automation
-cd ~/Documents/GitHub/demo_automation
-pip install -r requirements.txt
-```
+> Install the `sc:provision-demo` skill from `https://github.com/Rafsilva0/demo_automation`. Clone the repo to `~/Documents/GitHub/demo_automation` if it doesn't exist yet, install Python dependencies, copy `skills/provision-demo/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md`, and register `sc@sc-claude-tools` in `~/.claude/settings.json` under `enabledPlugins`. Then tell me to restart Claude Code.
 
-### 2. Install the Claude Code skill
-
-Copy the skill into your local Claude plugins cache and register the `sc` plugin namespace:
+That's it — Claude will handle everything. After restarting, type `/sc:provision-demo` to confirm it's loaded.
 
 > **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
-```bash
-SKILLS_DIR=~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills
-
-# Create the target directory
-mkdir -p "$SKILLS_DIR/provision-demo"
-
-# Copy the skill file
-cp ~/Documents/GitHub/demo_automation/skills/provision-demo/SKILL.md \
-   "$SKILLS_DIR/provision-demo/SKILL.md"
-
-# Register the sc plugin with Claude Code (required — otherwise the skill is invisible)
-node -e "
-  const fs = require('fs'), p = require('os').homedir() + '/.claude/settings.json';
-  const s = JSON.parse(fs.readFileSync(p, 'utf8'));
-  if (!s.enabledPlugins) s.enabledPlugins = {};
-  s.enabledPlugins['sc@sc-claude-tools'] = true;
-  fs.writeFileSync(p, JSON.stringify(s, null, 2));
-  console.log('Done — sc@sc-claude-tools registered.');
-"
-```
-
-> **Note:** You only need to do this once. To update the skill in future, just re-run the copy command after pulling the latest changes.
-
-### 3. Restart Claude Code
-
-Quit and reopen Claude Code so it picks up the new skill. Verify it's loaded by typing `/sc:provision-demo` — you should see it in autocomplete.
+> **Hit a blocker or error?** Reach out to Raf Silva on Slack.
 
 ---
 
@@ -70,20 +39,10 @@ Claude will:
 4. **Provision** the bot (~10 min)
 5. **Give you the summary** — chat link, API key, Beeceptor dashboard, and suggested questions to ask
 
-> **Hit a blocker or error?** Reach out to Raf Silva on Slack.
-
 ---
 
 ## Keeping the skill up to date
 
-When the skill is updated in this repo, pull and re-copy:
+Paste this into Claude Code:
 
-```bash
-cd ~/Documents/GitHub/demo_automation
-git pull
-
-cp skills/provision-demo/SKILL.md \
-   ~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md
-```
-
-Then restart Claude Code.
+> Update the `sc:provision-demo` skill — pull the latest from `https://github.com/Rafsilva0/demo_automation` and re-copy `skills/provision-demo/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md`. Then tell me to restart Claude Code.
