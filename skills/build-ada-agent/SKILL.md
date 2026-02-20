@@ -1,6 +1,6 @@
 ---
-name: provision-demo
-description: Provision a full Ada AI agent demo from a company name and website. Researches the prospect via Glean and Granola, presents a customisable plan for the SC to approve, then provisions the bot and delivers a ready-to-use summary with chat link, API key, Beeceptor endpoints, and suggested questions. Built by Raf Silva — reach out to him on Slack if you hit any errors or blockers.
+name: build-ada-agent
+description: Build a full Ada AI agent demo from a company name and website. Researches the prospect via Glean and Granola, presents a customisable plan for the SC to approve, then provisions the bot and delivers a ready-to-use summary with chat link, API key, Beeceptor endpoints, and suggested questions. Built by Raf Silva — reach out to him on Slack if you hit any errors or blockers.
 require-tools:
   - Bash
   - mcp__22fd8384*
@@ -263,10 +263,10 @@ Then present the full **post-provision summary**:
 
 ## Example Usage
 
-- `/pd:provision-demo Club Brugge https://www.clubbrugge.be`
-- `/pd:provision-demo Shopify https://www.shopify.com`
-- `/pd:provision-demo Air Canada` (no website — will skip live scrape)
-- `/pd:provision-demo Contabo GmbH https://contabo.com` → SC adds a 3rd action → script runs with `--actions 3`
+- `/sc:build-ada-agent Club Brugge https://www.clubbrugge.be`
+- `/sc:build-ada-agent Shopify https://www.shopify.com`
+- `/sc:build-ada-agent Air Canada` (no website — will skip live scrape)
+- `/sc:build-ada-agent Contabo GmbH https://contabo.com` → SC adds a 3rd action → script runs with `--actions 3`
 
 ---
 

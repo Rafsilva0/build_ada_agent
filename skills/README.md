@@ -6,7 +6,7 @@ These skills let the SC team run the Ada demo provisioning directly from Claude 
 
 | Skill | Description |
 |-------|-------------|
-| `sc:provision-demo` | Provision a full Ada demo bot from a company name + website |
+| `sc:build-ada-agent` | Build a full Ada AI agent demo from a company name + website |
 
 ---
 
@@ -14,9 +14,9 @@ These skills let the SC team run the Ada demo provisioning directly from Claude 
 
 Copy and paste the following prompt into Claude Code:
 
-> Install the `sc:provision-demo` skill from `https://github.com/Rafsilva0/demo_automation`. Clone the repo to `~/Documents/GitHub/demo_automation` if it doesn't exist yet, install Python dependencies, copy `skills/provision-demo/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md`, and register `sc@sc-claude-tools` in `~/.claude/settings.json` under `enabledPlugins`. Then tell me to restart Claude Code.
+> Install the `sc:build-ada-agent` skill from `https://github.com/Rafsilva0/demo_automation`. Clone the repo to `~/Documents/GitHub/demo_automation` if it doesn't exist yet, install Python dependencies, copy `skills/build-ada-agent/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/build-ada-agent/SKILL.md`, and register `sc@sc-claude-tools` in `~/.claude/settings.json` under `enabledPlugins`. Then tell me to restart Claude Code.
 
-That's it — Claude will handle everything. After restarting, type `/sc:provision-demo` to confirm it's loaded.
+That's it — Claude will handle everything. After restarting, type `/sc:build-ada-agent` to confirm it's loaded.
 
 > **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
@@ -27,9 +27,9 @@ That's it — Claude will handle everything. After restarting, type `/sc:provisi
 ## Usage
 
 ```
-/sc:provision-demo Club Brugge https://www.clubbrugge.be
-/sc:provision-demo Shopify https://www.shopify.com
-/sc:provision-demo Air Canada
+/sc:build-ada-agent Club Brugge https://www.clubbrugge.be
+/sc:build-ada-agent Shopify https://www.shopify.com
+/sc:build-ada-agent Air Canada
 ```
 
 Claude will:
@@ -45,4 +45,4 @@ Claude will:
 
 Paste this into Claude Code:
 
-> Update the `sc:provision-demo` skill — pull the latest from `https://github.com/Rafsilva0/demo_automation` and re-copy `skills/provision-demo/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md`. Then tell me to restart Claude Code.
+> Update the `sc:build-ada-agent` skill — pull the latest from `https://github.com/Rafsilva0/demo_automation` and re-copy `skills/build-ada-agent/SKILL.md` to `~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/build-ada-agent/SKILL.md`. Then tell me to restart Claude Code.
