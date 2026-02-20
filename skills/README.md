@@ -6,7 +6,7 @@ These skills let the SC team run the Ada demo provisioning directly from Claude 
 
 | Skill | Description |
 |-------|-------------|
-| `pd:provision-demo` | Provision a full Ada demo bot from a company name + website |
+| `sc:provision-demo` | Provision a full Ada demo bot from a company name + website |
 
 ---
 
@@ -15,7 +15,7 @@ These skills let the SC team run the Ada demo provisioning directly from Claude 
 ### 1. Clone the repo (if you haven't already)
 
 ```bash
-git clone git@github.com:Rafsilva0/demo_automation.git ~/Documents/GitHub/demo_automation
+git clone https://github.com/Rafsilva0/demo_automation.git ~/Documents/GitHub/demo_automation
 cd ~/Documents/GitHub/demo_automation
 pip install -r requirements.txt
 ```
@@ -27,7 +27,7 @@ Copy the skill into your local Claude plugins cache:
 > **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
 ```bash
-SKILLS_DIR=~/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills
+SKILLS_DIR=~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills
 
 # Create the target directory
 mkdir -p "$SKILLS_DIR/provision-demo"
@@ -39,18 +39,18 @@ cp ~/Documents/GitHub/demo_automation/skills/provision-demo/SKILL.md \
 
 > **Note:** You only need to do this once. To update the skill in future, just re-run the copy command after pulling the latest changes.
 
-### 4. Restart Claude Code
+### 3. Restart Claude Code
 
-Quit and reopen Claude Code so it picks up the new skill. Verify it's loaded by typing `/pd:provision-demo` — you should see it in autocomplete.
+Quit and reopen Claude Code so it picks up the new skill. Verify it's loaded by typing `/sc:provision-demo` — you should see it in autocomplete.
 
 ---
 
 ## Usage
 
 ```
-/pd:provision-demo Club Brugge https://www.clubbrugge.be
-/pd:provision-demo Shopify https://www.shopify.com
-/pd:provision-demo Air Canada
+/sc:provision-demo Club Brugge https://www.clubbrugge.be
+/sc:provision-demo Shopify https://www.shopify.com
+/sc:provision-demo Air Canada
 ```
 
 Claude will:
@@ -59,6 +59,8 @@ Claude will:
 3. **Wait for your approval** (you can swap actions, change focus, etc.)
 4. **Provision** the bot (~10 min)
 5. **Give you the summary** — chat link, API key, Beeceptor dashboard, and suggested questions to ask
+
+> **Hit a blocker or error?** Reach out to Raf Silva on Slack.
 
 ---
 
@@ -71,7 +73,7 @@ cd ~/Documents/GitHub/demo_automation
 git pull
 
 cp skills/provision-demo/SKILL.md \
-   ~/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills/provision-demo/SKILL.md
+   ~/.claude/plugins/cache/sc-claude-tools/sc/5.5/skills/provision-demo/SKILL.md
 ```
 
 Then restart Claude Code.

@@ -1,6 +1,6 @@
 ---
 name: provision-demo
-description: Provision a full Ada AI agent demo from a company name and website. Researches the prospect via Glean and Granola, presents a customisable plan for the SC to approve, then provisions the bot and delivers a ready-to-use summary with chat link, API key, Beeceptor endpoints, and suggested questions.
+description: Provision a full Ada AI agent demo from a company name and website. Researches the prospect via Glean and Granola, presents a customisable plan for the SC to approve, then provisions the bot and delivers a ready-to-use summary with chat link, API key, Beeceptor endpoints, and suggested questions. Built by Raf Silva — reach out to him on Slack if you hit any errors or blockers.
 require-tools:
   - Bash
   - mcp__22fd8384*
