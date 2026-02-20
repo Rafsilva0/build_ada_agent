@@ -20,22 +20,11 @@ cd ~/Documents/GitHub/demo_automation
 pip install -r requirements.txt
 ```
 
-### 2. Set up your `.env` file
-
-```bash
-cp .env.example .env
-# Fill in your credentials — ask Rafael for the values
-```
-
-Required vars:
-- `ADA_CLONE_SECRET` — Ada clone API secret
-- `ADA_BOT_PASSWORD` — Ada dashboard password
-- `ANTHROPIC_API_KEY` — For AI-generated KB articles
-- `BEECEPTOR_AUTH_TOKEN` — For mock API endpoints
-
-### 3. Install the Claude Code skill
+### 2. Install the Claude Code skill
 
 Copy the skill into your local Claude plugins cache:
+
+> **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
 ```bash
 SKILLS_DIR=~/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills
