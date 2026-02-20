@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 ### 2. Install the Claude Code skill
 
-Copy the skill into your local Claude plugins cache:
+Copy the skill into your local Claude plugins cache and register the `sc` plugin namespace:
 
 > **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
@@ -35,6 +35,16 @@ mkdir -p "$SKILLS_DIR/provision-demo"
 # Copy the skill file
 cp ~/Documents/GitHub/demo_automation/skills/provision-demo/SKILL.md \
    "$SKILLS_DIR/provision-demo/SKILL.md"
+
+# Register the sc plugin with Claude Code (required — otherwise the skill is invisible)
+node -e "
+  const fs = require('fs'), p = require('os').homedir() + '/.claude/settings.json';
+  const s = JSON.parse(fs.readFileSync(p, 'utf8'));
+  if (!s.enabledPlugins) s.enabledPlugins = {};
+  s.enabledPlugins['sc@sc-claude-tools'] = true;
+  fs.writeFileSync(p, JSON.stringify(s, null, 2));
+  console.log('Done — sc@sc-claude-tools registered.');
+"
 ```
 
 > **Note:** You only need to do this once. To update the skill in future, just re-run the copy command after pulling the latest changes.
