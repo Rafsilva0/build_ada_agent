@@ -123,32 +123,50 @@ If the SC requests changes, update the plan and present it again. Repeat until t
 
 ### Step 3 — Provision the Agent
 
-Once the SC approves (says "looks good", "go", "yes", "provision it", etc.), run the provisioner:
+Once the SC approves (says "looks good", "go", "yes", "provision it", etc.):
+
+**First, tell the SC what's about to happen:**
+```
+🚀 Kicking off provisioning for {Company Name}...
+This takes about 10 minutes. I'll give you a live progress update at each stage.
+
+  Phase 1 — Bot handle generation
+  Phase 2 — Clone bot from Ada SC demo template
+  Phase 3 — Beeceptor mock API endpoints
+  Phase 4 — Playwright: API key retrieval + website scrape + action import
+  Phase 5 — Knowledge base: 10 AI-generated articles
+  Phase 6 — 70 customer questions generated
+  Phase 7 — 70 conversations seeded
+```
+
+**Then run the provisioner:**
 
 ```bash
 cd /Users/rafsilva/Documents/GitHub/demo_automation && \
-python3 provision.py --company "{COMPANY NAME}" --auto --website "{WEBSITE URL}"
+python3 provision.py --company "{COMPANY NAME}" --auto --website "{WEBSITE URL}" --actions {NUM_ACTIONS}
 ```
 
 - If no website was provided: omit `--website` flag
-- The script will take **8–12 minutes** — let the SC know upfront
+- `--actions` defaults to 2; set to the number of actions in the approved plan
+- The script will take **8–12 minutes**
 
-Tell the SC before running:
-```
-🚀 Starting provisioning for {Company Name}...
-This takes about 10 minutes. I'll show you live output and share the full summary when it's done.
-```
+**Stream progress milestones** as they appear in the output. After each one, post a brief update to the SC:
 
-Stream the output live. Key milestones to watch for in the logs:
-- `✓ Bot cloned` — base bot is ready
-- `✓ API key retrieved` — Playwright automation succeeded
-- `✓ Knowledge base created` — articles uploaded
-- `✓ Beeceptor endpoints created` — mock APIs ready
-- `✓ Actions imported` — actions live in Ada
-- `✓ Conversations seeded` — 70 Q&A pairs loaded
+| Log pattern | Message to post |
+|---|---|
+| `✅ Bot handle:` | `✅ Phase 1 done — Bot handle: {handle}` |
+| `Bot may already exist` or `✅ Bot cloned` | `✅ Phase 2 done — Bot cloned from template` (HTTP 500 = already exists, safe) |
+| `✅ Created N Beeceptor endpoints` | `✅ Phase 3 done — {N} mock API endpoints live on Beeceptor` |
+| `✅ API key retrieved` | `✅ Phase 4a done — API key retrieved automatically` |
+| `Website source addition failed` | `⚠️ Phase 4b — Website scrape timed out (non-critical, KB articles still loading)` |
+| `✅ Imported N actions` | `✅ Phase 4c done — {N} actions imported and activated` |
+| `✅ Uploaded 10 articles` | `✅ Phase 5 done — 10 knowledge articles live` |
+| `✅ Generated 70 questions` | `✅ Phase 6 done — 70 customer questions generated` |
+| `✓ 70/70 conversations created` | `✅ Phase 7 done — 70 conversations seeded` |
+| `🎉 PROVISIONING COMPLETE` | Present the full post-provision summary (Step 4) |
 
-If the script exits with an error, share the error message and suggest:
-- HTTP 500 on clone = bot already exists (safe to continue manually)
+If the script exits with an error:
+- HTTP 500 on clone = bot already exists, safe to continue
 - Timeout on website scrape = non-critical, KB articles still loaded
 - Missing env var = check `.env` file in the repo root
 
@@ -218,6 +236,7 @@ Then present the full **post-provision summary**:
 - `/pd:provision-demo Club Brugge https://www.clubbrugge.be`
 - `/pd:provision-demo Shopify https://www.shopify.com`
 - `/pd:provision-demo Air Canada` (no website — will skip live scrape)
+- `/pd:provision-demo Contabo GmbH https://contabo.com` → SC adds a 3rd action → script runs with `--actions 3`
 
 ---
 

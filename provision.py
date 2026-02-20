@@ -696,75 +696,76 @@ No markdown. No text outside JSON."""
     print_substep("", f"Sample: \"{questions[0][:60]}...\"")
     return questions
 
-async def create_beeceptor_endpoints(bot_handle: str, company_name: str) -> tuple[bool, List[Dict]]:
-    """Create Beeceptor API endpoints and return action configurations."""
+async def create_beeceptor_endpoints(bot_handle: str, company_name: str, num_actions: int = 2) -> tuple[bool, List[Dict]]:
+    """Create Beeceptor API endpoints and return action configurations.
+
+    Args:
+        bot_handle: Bot handle for endpoint path namespacing
+        company_name: Company name for industry detection
+        num_actions: Number of actions/endpoints to generate (default: 2)
+    """
     print_header("📡 PHASE 6: Beeceptor Endpoint Creation")
 
+    num_actions = max(1, num_actions)  # At least 1
     print_substep("6.1", "Generating industry-specific mock API endpoint configurations using Claude AI...")
-    print_substep("", f"Creating 2 mock endpoints for: {bot_handle}")
+    print_substep("", f"Creating {num_actions} mock endpoints for: {bot_handle}")
+
+    # Build dynamic JSON schema for N rules and N actions
+    rules_schema = "\n".join([
+        f'    "use_case_{i}_rule": {{\n'
+        f'      "enabled": true,\n'
+        f'      "mock": true,\n'
+        f'      "delay": 0,\n'
+        f'      "match": {{"method": "GET or POST", "value": "/{bot_handle}/meaningful_endpoint_name_{i}", "operator": "SW"}},\n'
+        f'      "send": {{"status": 200, "body": "realistic JSON response as escaped string", "headers": {{"Content-Type": "application/json"}}, "templated": false}}\n'
+        f'    }}'
+        for i in range(1, num_actions + 1)
+    ])
+    actions_schema = "\n".join([
+        f'    {{\n'
+        f'      "name": "Descriptive action {i} name",\n'
+        f'      "description": "What this action does for the customer",\n'
+        f'      "url": "https://ada-demo.proxy.beeceptor.com/{bot_handle}/meaningful_endpoint_name_{i}",\n'
+        f'      "headers": [],\n'
+        f'      "inputs": [],\n'
+        f'      "outputs": [{{"id": "output{i}", "name": "output", "key": "*", "is_visible_to_llm": true, "save_as_variable": false, "variable_name": ""}}],\n'
+        f'      "request_body": "",\n'
+        f'      "content_type": "json",\n'
+        f'      "method": "GET or POST"\n'
+        f'    }}'
+        for i in range(1, num_actions + 1)
+    ])
 
     endpoints_prompt = f"""You are creating mock API endpoints for {company_name}. First, identify what industry this company is in (e.g., e-commerce/retail, banking, healthcare, telecommunications, insurance, etc.).
 
-Then create 2 realistic Beeceptor rule configurations that represent common customer support use cases for that industry.
+Then create {num_actions} realistic Beeceptor rule configurations that represent common customer support use cases for that industry. Each use case should be distinct and cover a different customer need.
 
 Examples by industry:
-- E-commerce/Retail: order_tracking, product_availability, return_status
-- Banking: account_balance, transaction_history, card_activation
-- Healthcare: appointment_scheduling, prescription_status, test_results
-- Telecommunications: plan_details, usage_info, service_status
-- Insurance: claim_status, policy_details, coverage_check
+- E-commerce/Retail: order_tracking, product_availability, return_status, loyalty_points
+- Banking: account_balance, transaction_history, card_activation, loan_status
+- Healthcare: appointment_scheduling, prescription_status, test_results, referral_status
+- Telecommunications: plan_details, usage_info, service_status, bill_summary
+- Insurance: claim_status, policy_details, coverage_check, renewal_quote
+- Cloud Hosting/VPS: server_status, restart_server, ticket_status, invoice_lookup
 
-For {company_name}, create 2 endpoints with:
+For {company_name}, create {num_actions} endpoints with:
 1. Descriptive endpoint paths (not generic like "status_check")
 2. Realistic response bodies with relevant fields for that industry
 3. Appropriate HTTP methods (GET for queries, POST for actions)
+4. Each endpoint should be a genuinely distinct customer support use case
 
 Return ONLY this JSON structure with NO markdown formatting:
 {{
   "industry": "detected industry name",
   "result": {{
-    "use_case_1_rule": {{
-      "enabled": true,
-      "mock": true,
-      "delay": 0,
-      "match": {{"method": "GET or POST", "value": "/{bot_handle}/meaningful_endpoint_name", "operator": "SW"}},
-      "send": {{"status": 200, "body": "realistic JSON response as escaped string", "headers": {{"Content-Type": "application/json"}}, "templated": false}}
-    }},
-    "use_case_2_rule": {{
-      "enabled": true,
-      "mock": true,
-      "delay": 0,
-      "match": {{"method": "GET or POST", "value": "/{bot_handle}/another_endpoint_name", "operator": "SW"}},
-      "send": {{"status": 200, "body": "realistic JSON response as escaped string", "headers": {{"Content-Type": "application/json"}}, "templated": false}}
-    }}
+{rules_schema}
   }},
   "ada_actions": [
-    {{
-      "name": "Descriptive action name",
-      "description": "What this action does for the customer",
-      "url": "https://ada-demo.proxy.beeceptor.com/{bot_handle}/meaningful_endpoint_name",
-      "headers": [],
-      "inputs": [],
-      "outputs": [{{"id": "output1", "name": "output", "key": "*", "is_visible_to_llm": true, "save_as_variable": false, "variable_name": ""}}],
-      "request_body": "",
-      "content_type": "json",
-      "method": "GET or POST"
-    }},
-    {{
-      "name": "Second action name",
-      "description": "What this action does",
-      "url": "https://ada-demo.proxy.beeceptor.com/{bot_handle}/another_endpoint_name",
-      "headers": [],
-      "inputs": [],
-      "outputs": [{{"id": "output2", "name": "output", "key": "*", "is_visible_to_llm": true, "save_as_variable": false, "variable_name": ""}}],
-      "request_body": "",
-      "content_type": "json",
-      "method": "GET or POST"
-    }}
+{actions_schema}
   ]
 }}"""
 
-    endpoints_response = await generate_claude_completion(endpoints_prompt, temperature=0.7, max_tokens=3000)
+    endpoints_response = await generate_claude_completion(endpoints_prompt, temperature=0.7, max_tokens=500 * num_actions + 1000)
 
     print_substep("6.2", "Parsing Claude response and extracting rules...")
     cleaned = endpoints_response.strip()
@@ -784,40 +785,27 @@ Return ONLY this JSON structure with NO markdown formatting:
     industry = endpoints.get("industry", "unknown")
     print_substep("", f"Detected industry: {industry}")
 
-    # Create endpoints in Beeceptor
-    rule1 = json.dumps(endpoints["result"]["use_case_1_rule"])
-    rule2 = json.dumps(endpoints["result"]["use_case_2_rule"])
-
-    # Extract endpoint names for logging
-    endpoint1_path = endpoints["result"]["use_case_1_rule"]["match"]["value"]
-    endpoint2_path = endpoints["result"]["use_case_2_rule"]["match"]["value"]
-    method1 = endpoints["result"]["use_case_1_rule"]["match"]["method"]
-    method2 = endpoints["result"]["use_case_2_rule"]["match"]["method"]
-
-    print_substep("6.3", f"Posting rule #1 to Beeceptor API ({method1} {endpoint1_path})...")
+    # Post all rules to Beeceptor dynamically
+    rules = endpoints.get("result", {})
     async with httpx.AsyncClient() as client:
-        await client.post(
-            "https://api.beeceptor.com/api/v1/endpoints/ada-demo/rules",
-            headers={"Authorization": BEECEPTOR_TOKEN, "Content-Type": "application/json"},
-            content=rule1,
-            timeout=30.0
-        )
+        for i, (rule_key, rule_value) in enumerate(rules.items(), 1):
+            rule_json = json.dumps(rule_value)
+            endpoint_path = rule_value["match"]["value"]
+            method = rule_value["match"]["method"]
+            print_substep(f"6.{i + 2}", f"Posting rule #{i} to Beeceptor API ({method} {endpoint_path})...")
+            await client.post(
+                "https://api.beeceptor.com/api/v1/endpoints/ada-demo/rules",
+                headers={"Authorization": BEECEPTOR_TOKEN, "Content-Type": "application/json"},
+                content=rule_json,
+                timeout=30.0
+            )
 
-        print_substep("6.4", f"Posting rule #2 to Beeceptor API ({method2} {endpoint2_path})...")
-        await client.post(
-            "https://api.beeceptor.com/api/v1/endpoints/ada-demo/rules",
-            headers={"Authorization": BEECEPTOR_TOKEN, "Content-Type": "application/json"},
-            content=rule2,
-            timeout=30.0
-        )
-
-    print_status("✅", "Created 2 Beeceptor endpoints", Colors.OKGREEN)
+    print_status("✅", f"Created {len(rules)} Beeceptor endpoints", Colors.OKGREEN)
     print_substep("", "View at: https://app.beeceptor.com/console/ada-demo")
 
     # Return the Ada action configurations for import
     ada_actions = endpoints.get("ada_actions", [])
 
-    # Debug: print the actions
     if ada_actions:
         print_substep("", f"Generated {len(ada_actions)} Ada action configs:")
         for action in ada_actions:
@@ -1033,6 +1021,7 @@ async def provision_demo(
     num_articles: int = 10,
     num_questions: int = 70,
     num_conversations: Optional[int] = None,
+    num_actions: int = 2,
     dry_run: bool = False,
     progress_callback: Optional[callable] = None
 ) -> Dict[str, Any]:
@@ -1048,6 +1037,7 @@ async def provision_demo(
         num_articles: Number of knowledge articles to generate
         num_questions: Number of customer questions to generate
         num_conversations: Number of conversations to create (defaults to num_questions)
+        num_actions: Number of Beeceptor mock API actions to create (default: 2)
         dry_run: If True, only validate and show what would be done
         progress_callback: Optional callback function to report progress updates
 
@@ -1087,6 +1077,7 @@ async def provision_demo(
         print_status("🔍", "Would create bot and retrieve API key", Colors.WARNING)
         print_status("🔍", f"Would generate {num_articles} articles and {num_questions} questions", Colors.WARNING)
         print_status("🔍", f"Would create {num_conversations or num_questions} conversations", Colors.WARNING)
+        print_status("🔍", f"Would create {num_actions} Beeceptor mock API actions", Colors.WARNING)
         return {
             "success": True,
             "dry_run": True,
@@ -1131,7 +1122,7 @@ async def provision_demo(
 
         # Create Beeceptor endpoints
         update_progress(6, "Creating Beeceptor endpoints...")
-        beeceptor_success, ada_actions = await create_beeceptor_endpoints(bot_handle, company_name)
+        beeceptor_success, ada_actions = await create_beeceptor_endpoints(bot_handle, company_name, num_actions)
         update_progress(6, "Beeceptor endpoints created")
 
         # Now run Playwright tasks (website + actions only)
@@ -1148,7 +1139,7 @@ async def provision_demo(
         # Auto-retrieve mode: need to get API key first, then use unified session
         # First, just get Beeceptor actions ready
         update_progress(3, "Preparing Beeceptor endpoints for action import...")
-        beeceptor_success, ada_actions = await create_beeceptor_endpoints(bot_handle, company_name)
+        beeceptor_success, ada_actions = await create_beeceptor_endpoints(bot_handle, company_name, num_actions)
 
         # Run unified Playwright session: API key + website + actions
         update_progress(3, "Running unified Playwright session...")
@@ -1249,6 +1240,7 @@ Examples:
     parser.add_argument("--articles", type=int, default=10, help="Number of knowledge articles (default: 10)")
     parser.add_argument("--questions", type=int, default=70, help="Number of questions (default: 70)")
     parser.add_argument("--conversations", type=int, help="Number of conversations (default: same as questions)")
+    parser.add_argument("--actions", type=int, default=2, help="Number of mock API actions to create via Beeceptor (default: 2)")
     parser.add_argument("--dry-run", action="store_true", help="Validate without making changes")
 
     args = parser.parse_args()
@@ -1269,6 +1261,7 @@ Examples:
             num_articles=args.articles,
             num_questions=args.questions,
             num_conversations=args.conversations,
+            num_actions=args.actions,
             dry_run=args.dry_run
         ))
 
