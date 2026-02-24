@@ -79,7 +79,7 @@ ls ~/Documents/GitHub/build_ada_agent/provision.py
 If the file is missing, tell the user:
 ```
 The build_ada_agent repo isn't set up on this machine yet. Run:
-  git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/build_ada_agent
+  git clone https://github.com/Rafsilva0/build_ada_agent.git ~/Documents/GitHub/build_ada_agent
   cd ~/Documents/GitHub/build_ada_agent && pip install -r requirements.txt
 Then re-run this skill.
 ```
