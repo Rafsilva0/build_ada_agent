@@ -11,7 +11,8 @@
 #   2. Writes plugin.json (so Claude Code detects the plugin)
 #   3. Writes SKILL.md (the skill definition)
 #   4. Registers "pd@ada-demo-tools" in ~/.claude/settings.json
-#   5. Tells you to restart Claude Code
+#   5. Registers "pd@ada-demo-tools" in ~/.claude/plugins/installed_plugins.json
+#   6. Tells you to restart Claude Code
 
 set -e
 
@@ -318,31 +319,70 @@ Then present the full **post-provision summary**:
 - **Notion credentials page:** ID `30d6162e53cd80a48ac0d1a50676a46e` — shared with the SC team (comment access).
 SKILL_EOF
 
-# ── 3. Register plugin in ~/.claude/settings.json ────────────────────────────
-python3 - << 'PYTHON_EOF'
+# ── 3. Register plugin in ~/.claude/settings.json and installed_plugins.json ──
+python3 - << PYTHON_EOF
 import json
 import os
+from datetime import datetime, timezone
 
+PLUGIN_KEY = "pd@ada-demo-tools"
+INSTALL_PATH = os.path.expanduser("~/.claude/plugins/cache/ada-demo-tools/pd/5.5")
+now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+# Get current git commit SHA for the record (best-effort)
+import subprocess
+try:
+    git_sha = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"],
+        cwd=os.path.dirname(os.path.abspath("$0")),
+        stderr=subprocess.DEVNULL
+    ).decode().strip()
+except Exception:
+    git_sha = "unknown"
+
+# ── settings.json ─────────────────────────────────────────────────────────────
 settings_path = os.path.expanduser("~/.claude/settings.json")
-
-# Load existing settings (or start fresh)
 if os.path.exists(settings_path):
     with open(settings_path, "r") as f:
         settings = json.load(f)
 else:
     settings = {}
 
-# Ensure enabledPlugins key exists
 if "enabledPlugins" not in settings:
     settings["enabledPlugins"] = {}
 
-# Register the plugin (idempotent)
-settings["enabledPlugins"]["pd@ada-demo-tools"] = True
+settings["enabledPlugins"][PLUGIN_KEY] = True
 
 with open(settings_path, "w") as f:
     json.dump(settings, f, indent=2)
 
-print("✅ Registered pd@ada-demo-tools in ~/.claude/settings.json")
+print("✅ Registered in ~/.claude/settings.json")
+
+# ── installed_plugins.json ────────────────────────────────────────────────────
+installed_path = os.path.expanduser("~/.claude/plugins/installed_plugins.json")
+if os.path.exists(installed_path):
+    with open(installed_path, "r") as f:
+        installed = json.load(f)
+else:
+    installed = {"version": 2, "plugins": {}}
+
+installed.setdefault("plugins", {})
+
+installed["plugins"][PLUGIN_KEY] = [
+    {
+        "scope": "user",
+        "installPath": INSTALL_PATH,
+        "version": "5.5",
+        "installedAt": now,
+        "lastUpdated": now,
+        "gitCommitSha": git_sha
+    }
+]
+
+with open(installed_path, "w") as f:
+    json.dump(installed, f, indent=4)
+
+print("✅ Registered in ~/.claude/plugins/installed_plugins.json")
 PYTHON_EOF
 
 echo ""
