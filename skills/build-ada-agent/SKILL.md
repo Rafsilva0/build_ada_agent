@@ -40,8 +40,8 @@ ls ~/Documents/GitHub/demo_automation/provision.py
 
 If the file is missing, tell the user:
 ```
-The demo_automation repo isn't set up on this machine yet. Run:
-  git clone git@github.com:Rafsilva0/demo_automation.git ~/Documents/GitHub/demo_automation
+The build_ada_agent repo isn't set up on this machine yet. Run:
+  git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/demo_automation
   cd ~/Documents/GitHub/demo_automation && pip install -r requirements.txt
 Then re-run this skill.
 ```
