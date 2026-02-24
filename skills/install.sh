@@ -1,23 +1,40 @@
 #!/bin/bash
 # install.sh — Install the pd:build-ada-agent skill for Claude Code
-# No GitHub access required. Run this script and restart Claude Code.
+# Self-contained: creates its own plugin (ada-demo-tools) and registers it.
+# No GitHub access or prior pd-claude-tools setup required.
 #
 # Usage:
 #   bash install.sh
 #
 # What it does:
-#   1. Creates the skill directory inside the pd-claude-tools plugin cache
-#   2. Writes SKILL.md inline (no internet or GitHub access needed)
-#   3. Tells you to restart Claude Code
+#   1. Creates the ada-demo-tools plugin directory
+#   2. Writes plugin.json (so Claude Code detects the plugin)
+#   3. Writes SKILL.md (the skill definition)
+#   4. Registers "pd@ada-demo-tools" in ~/.claude/settings.json
+#   5. Tells you to restart Claude Code
 
 set -e
 
-SKILL_DIR="$HOME/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills/build-ada-agent"
+PLUGIN_DIR="$HOME/.claude/plugins/cache/ada-demo-tools/pd/5.5"
+SKILL_DIR="$PLUGIN_DIR/skills/build-ada-agent"
+PLUGIN_JSON_DIR="$PLUGIN_DIR/.claude-plugin"
 
 echo "Installing pd:build-ada-agent skill..."
 
 mkdir -p "$SKILL_DIR"
+mkdir -p "$PLUGIN_JSON_DIR"
 
+# ── 1. Write plugin.json ──────────────────────────────────────────────────────
+cat > "$PLUGIN_JSON_DIR/plugin.json" << 'PLUGIN_EOF'
+{
+  "name": "pd",
+  "version": "5.5",
+  "description": "Ada SC demo automation tools",
+  "repository": "https://github.com/AdaSupport/build_ada_agent"
+}
+PLUGIN_EOF
+
+# ── 2. Write SKILL.md ─────────────────────────────────────────────────────────
 cat > "$SKILL_DIR/SKILL.md" << 'SKILL_EOF'
 ---
 name: build-ada-agent
@@ -61,7 +78,7 @@ ls ~/Documents/GitHub/demo_automation/provision.py
 
 If the file is missing, tell the user:
 ```
-The build_ada_agent repo isn't set up on this machine yet. Run:
+The demo_automation repo isn't set up on this machine yet. Run:
   git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/demo_automation
   cd ~/Documents/GitHub/demo_automation && pip install -r requirements.txt
 Then re-run this skill.
@@ -301,12 +318,36 @@ Then present the full **post-provision summary**:
 - **Notion credentials page:** ID `30d6162e53cd80a48ac0d1a50676a46e` — shared with the SC team (comment access).
 SKILL_EOF
 
+# ── 3. Register plugin in ~/.claude/settings.json ────────────────────────────
+python3 - << 'PYTHON_EOF'
+import json
+import os
+
+settings_path = os.path.expanduser("~/.claude/settings.json")
+
+# Load existing settings (or start fresh)
+if os.path.exists(settings_path):
+    with open(settings_path, "r") as f:
+        settings = json.load(f)
+else:
+    settings = {}
+
+# Ensure enabledPlugins key exists
+if "enabledPlugins" not in settings:
+    settings["enabledPlugins"] = {}
+
+# Register the plugin (idempotent)
+settings["enabledPlugins"]["pd@ada-demo-tools"] = True
+
+with open(settings_path, "w") as f:
+    json.dump(settings, f, indent=2)
+
+print("✅ Registered pd@ada-demo-tools in ~/.claude/settings.json")
+PYTHON_EOF
+
 echo ""
-echo "✅ Skill installed at:"
-echo "   $SKILL_DIR/SKILL.md"
+echo "✅ Skill installed:"
+echo "   Plugin:  $PLUGIN_JSON_DIR/plugin.json"
+echo "   Skill:   $SKILL_DIR/SKILL.md"
 echo ""
-echo "⚠️  One more thing — the skill runs provision.py, which needs the repo:"
-echo "   git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/demo_automation"
-echo "   cd ~/Documents/GitHub/demo_automation && pip install -r requirements.txt"
-echo ""
-echo "↩️  Now restart Claude Code, then type /pd:build-ada-agent to confirm it's loaded."
+echo "↩️  Restart Claude Code, then type /pd:build-ada-agent to confirm it's loaded."

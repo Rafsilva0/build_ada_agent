@@ -8,29 +8,19 @@ The `build-ada-agent` skill lets the SC team provision Ada demo bots directly fr
 |-------|-------------|
 | `pd:build-ada-agent` | Build a full Ada AI agent demo from a company name + website |
 
-The skill lives in the `pd-claude-tools` plugin (same as all other `pd:` skills).
-
 ---
 
 ## Installation
 
-### Option A — You have access to the `demo_automation` repo
-
-Paste this into Claude Code:
-
-> Copy `skills/build-ada-agent/SKILL.md` from `~/Documents/GitHub/demo_automation` to `~/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills/build-ada-agent/SKILL.md`, creating the directory if needed. Then tell me to restart Claude Code.
-
-### Option B — No GitHub access (share the install script)
-
-Ask Raf to send you `skills/install.sh` from this repo, then run:
+Run the install script — no GitHub access or prior setup required:
 
 ```bash
 bash install.sh
 ```
 
-No GitHub access needed — the script embeds the full skill inline and installs it directly.
+The script is self-contained: it creates the `ada-demo-tools` plugin, writes the skill, and registers it in Claude Code automatically.
 
-After either option, restart Claude Code and type `/pd:build-ada-agent` to confirm it's loaded.
+After running, restart Claude Code and type `/pd:build-ada-agent` to confirm it's loaded.
 
 > **No `.env` setup needed.** On first run, the skill automatically fetches shared credentials from a private Notion page and writes the `.env` file for you.
 
@@ -40,9 +30,13 @@ After either option, restart Claude Code and type `/pd:build-ada-agent` to confi
 
 ## Keeping the skill up to date
 
-Paste this into Claude Code:
+Re-run the install script to get the latest version:
 
-> Re-copy `skills/build-ada-agent/SKILL.md` from `~/Documents/GitHub/demo_automation` to `~/.claude/plugins/cache/pd-claude-tools/pd/5.5/skills/build-ada-agent/SKILL.md`. Then tell me to restart Claude Code.
+```bash
+bash install.sh
+```
+
+Then restart Claude Code.
 
 ---
 
