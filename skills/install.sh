@@ -53,7 +53,7 @@ Provision a fully-configured Ada AI agent demo for a prospect in ~10 minutes —
 ## Requirements
 
 This skill requires:
-- The **demo_automation** repo at `~/Documents/GitHub/demo_automation`
+- The **build_ada_agent** repo at `~/Documents/GitHub/build_ada_agent`
 - Python 3 + dependencies installed (`pip install -r requirements.txt`)
 - A valid `.env` file with `ADA_BOT_PASSWORD`, `ADA_CLONE_SECRET`, `ANTHROPIC_API_KEY`, `BEECEPTOR_AUTH_TOKEN`
 
@@ -73,14 +73,14 @@ Before doing anything else, check that the repo and credentials exist on this ma
 **Check repo:**
 
 ```bash
-ls ~/Documents/GitHub/demo_automation/provision.py
+ls ~/Documents/GitHub/build_ada_agent/provision.py
 ```
 
 If the file is missing, tell the user:
 ```
-The demo_automation repo isn't set up on this machine yet. Run:
-  git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/demo_automation
-  cd ~/Documents/GitHub/demo_automation && pip install -r requirements.txt
+The build_ada_agent repo isn't set up on this machine yet. Run:
+  git clone git@github.com:AdaSupport/build_ada_agent.git ~/Documents/GitHub/build_ada_agent
+  cd ~/Documents/GitHub/build_ada_agent && pip install -r requirements.txt
 Then re-run this skill.
 ```
 Stop here until resolved.
@@ -88,14 +88,14 @@ Stop here until resolved.
 **Check credentials:**
 
 ```bash
-ls ~/Documents/GitHub/demo_automation/.env
+ls ~/Documents/GitHub/build_ada_agent/.env
 ```
 
 - **If the file exists:** skip silently and proceed to Step 1.
 - **If the file is missing:**
   1. Fetch the shared credentials page from Notion using `mcp__729d2fa9-4409-4a97-838a-8eb8d2b766cf__notion-fetch` with ID `30d6162e53cd80a48ac0d1a50676a46e`
   2. Parse the `KEY=VALUE` lines from the code block in the page content
-  3. Write them to `~/Documents/GitHub/demo_automation/.env` using Bash (one `KEY=VALUE` per line, no quotes)
+  3. Write them to `~/Documents/GitHub/build_ada_agent/.env` using Bash (one `KEY=VALUE` per line, no quotes)
   4. Tell the user: `✅ Credentials loaded from Notion — .env created. You're all set for future runs.`
 
 ---
@@ -210,7 +210,7 @@ This takes about 10 minutes. I'll give you a live progress update at each stage.
 **Then run the provisioner:**
 
 ```bash
-cd ~/Documents/GitHub/demo_automation && \
+cd ~/Documents/GitHub/build_ada_agent && \
 python3 provision.py --company "{COMPANY NAME}" --auto --website "{WEBSITE URL}" --actions {NUM_ACTIONS}
 ```
 
@@ -314,7 +314,7 @@ Then present the full **post-provision summary**:
 - **Website scrape timeout:** Non-critical. KB articles are uploaded regardless. The website scrape is best-effort.
 - **API key retrieval:** Uses Playwright browser automation. If it fails, the SC can manually retrieve the key from the Ada dashboard.
 - **Bot URL pattern:** `{company-slug}-ai-agent-demo.ada.support` — slug is lowercase, alphanumeric only, hyphens for spaces.
-- **Credentials:** Stored in `~/Documents/GitHub/demo_automation/.env`. Auto-fetched from Notion on first run (Step 0).
+- **Credentials:** Stored in `~/Documents/GitHub/build_ada_agent/.env`. Auto-fetched from Notion on first run (Step 0).
 - **Notion credentials page:** ID `30d6162e53cd80a48ac0d1a50676a46e` — shared with the SC team (comment access).
 SKILL_EOF
 

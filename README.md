@@ -49,7 +49,7 @@ Bot URL: `https://{handle}.ada.support`
 ## Project Structure
 
 ```
-demo_automation/
+build_ada_agent/
 ├── provision.py          # Main provisioning script
 ├── skills/               # Claude Code skills
 │   ├── README.md         # SC team onboarding guide
