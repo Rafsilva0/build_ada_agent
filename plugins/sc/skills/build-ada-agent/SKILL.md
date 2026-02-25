@@ -1,11 +1,11 @@
 ---
 name: build-ada-agent
 description: Build a full Ada AI agent demo from a company name and website. Researches the prospect via Glean and Granola, presents a customisable plan for the SC to approve, then provisions the bot and delivers a ready-to-use summary with chat link, API key, Beeceptor endpoints, and suggested questions. Built by Raf Silva — reach out to him on Slack if you hit any errors or blockers.
-allowed-tools:
+require-tools:
   - Bash
-  - mcp__22fd8384*
-  - mcp__b64aba26*
-  - mcp__729d2fa9*
+  - mcp__claude_ai_Glean*
+  - mcp__claude_ai_Granola*
+  - mcp__claude_ai_Notion*
 ---
 
 # Provision Demo
@@ -55,7 +55,7 @@ ls ~/Documents/GitHub/build_ada_agent/.env
 
 - **If the file exists:** skip silently and proceed to Step 1.
 - **If the file is missing:**
-  1. Fetch the shared credentials page from Notion using `mcp__729d2fa9-4409-4a97-838a-8eb8d2b766cf__notion-fetch` with ID `30d6162e53cd80a48ac0d1a50676a46e`
+  1. Fetch the shared credentials page from Notion using `mcp__claude_ai_Notion__notion-fetch` with ID `30d6162e53cd80a48ac0d1a50676a46e`
   2. Parse the `KEY=VALUE` lines from the code block in the page content
   3. Write them to `~/Documents/GitHub/build_ada_agent/.env` using Bash (one `KEY=VALUE` per line, no quotes)
   4. Tell the user: `✅ Credentials loaded from Notion — .env created. You're all set for future runs.`
@@ -67,7 +67,7 @@ ls ~/Documents/GitHub/build_ada_agent/.env
 Spawn two parallel Task agents to gather intel on the prospect BEFORE building anything.
 
 #### Agent 1 — Glean Search
-Use `mcp__22fd8384-0cee-4806-b8a0-4ffa1ace36e6__search` and `mcp__22fd8384-0cee-4806-b8a0-4ffa1ace36e6__chat` to find:
+Use `mcp__claude_ai_Glean__search` and `mcp__claude_ai_Glean__chat` to find:
 - What industry/vertical is this company in?
 - What products or services do they sell?
 - Any known pain points, support challenges, or customer-facing workflows?
@@ -79,18 +79,25 @@ Search queries to try:
 - `"{company name}" AI automation`
 
 #### Agent 2 — Granola Meeting Notes
-Use `mcp__b64aba26-624b-471d-a4c9-bc9c8ca47541__query_granola_meetings` to find:
+Use `mcp__claude_ai_Granola__query_granola_meetings` to find:
 - Any discovery calls, demo prep notes, or sales meetings mentioning the company
 - Key contacts, pain points, or specific use cases the SC has discussed with them
 - Any commitments made (e.g. "they want to see order tracking")
 
 Query: `"{company name}" demo OR discovery OR prospect OR meeting`
 
-After both agents complete, synthesise findings into a **prospect brief** (3-5 bullet points):
+After both agents complete, synthesise findings into two things:
+
+**Prospect brief** (shown to SC, 3-5 bullet points):
 - Industry & business model
 - Likely top 2-3 customer support use cases
 - Any specific features or workflows the SC should highlight
 - Key contacts or context from past meetings
+
+**Prospect description** (passed to `provision.py` later — save this as a variable):
+A single plain-text paragraph, 3-5 sentences, covering: what the company does, who their customers are, and their top support use cases. No bullet points, no special characters or quotes. This becomes the context that drives KB article and conversation generation.
+
+Example: `Shopify is a leading e-commerce platform serving over 2 million merchants worldwide. Their customers frequently need help with store setup, payment processing, order management, and shipping configuration. Common support topics include subscription billing, app integrations, theme customization, and inventory sync issues.`
 
 ---
 
@@ -173,9 +180,10 @@ This takes about 10 minutes. I'll give you a live progress update at each stage.
 
 ```bash
 cd ~/Documents/GitHub/build_ada_agent && \
-python3 provision.py --company "{COMPANY NAME}" --auto --website "{WEBSITE URL}" --actions {NUM_ACTIONS}
+python3 provision.py --company "{COMPANY NAME}" --auto --website "{WEBSITE URL}" --actions {NUM_ACTIONS} --description "{PROSPECT DESCRIPTION}"
 ```
 
+- `{PROSPECT DESCRIPTION}`: the plain-text paragraph generated in Step 1 — this drives KB article and conversation content
 - If no website was provided: omit `--website` flag
 - `--actions` defaults to 2; set to the number of actions in the approved plan
 - The script will take **8–12 minutes**

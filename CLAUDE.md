@@ -34,9 +34,9 @@ When the user asks to create a new skill or add a tool for the SC team:
    ---
    name: skill-name
    description: One sentence — what it does and when to use it.
-   allowed-tools:
+   require-tools:
      - Bash
-     - mcp__notion*    # add any MCP tools the skill needs
+     - mcp__claude_ai_Notion*    # add any MCP tools the skill needs
    ---
    ```
 3. Write the skill instructions in markdown below the frontmatter.

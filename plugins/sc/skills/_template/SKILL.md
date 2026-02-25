@@ -1,12 +1,12 @@
 ---
 name: skill-name
 description: One sentence describing what this skill does and when to trigger it.
-allowed-tools:
+require-tools:
   - Bash
   # Add MCP tools as needed, e.g.:
-  # - mcp__notion*
-  # - mcp__glean*
-  # - mcp__slack*
+  # - mcp__claude_ai_Notion*
+  # - mcp__claude_ai_Glean*
+  # - mcp__claude_ai_Granola*
 ---
 
 # Skill Name
