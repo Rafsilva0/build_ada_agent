@@ -1,0 +1,13 @@
+{
+  "name": "build-ada-agent",
+  "owner": {
+    "name": "Ada SC Team"
+  },
+  "plugins": [
+    {
+      "name": "sc",
+      "source": "./plugins/sc",
+      "description": "Claude Code tools for the SC team"
+    }
+  ]
+}
